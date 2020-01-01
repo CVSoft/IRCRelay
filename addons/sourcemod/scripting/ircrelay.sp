@@ -245,8 +245,9 @@ public int OnSocketConnect(Handle socket, any arg)
     if (sPassword[0]) {
         IRC_SendRaw("PASS %s", sPassword);
     }
-
-    IRC_SendRaw("USER %s %s %s :IRC Relay\r\nNICK %s", g_sTrigger, g_sTrigger, g_sTrigger, g_sNickname);
+    // BosaikNet change
+    IRC_SendRaw("USER %s %s %s :%s IRC Relay, trigger with !%s.<cmd>\r\nNICK %s", g_sNickname, "*", "*", g_sNickname, g_sTrigger, g_sNickname);
+    // IRC_SendRaw("USER %s %s %s :IRC Relay\r\nNICK %s", g_sTrigger, g_sTrigger, g_sTrigger, g_sNickname);
 
     Call_StartForward(g_hOnConnect);
     Call_PushCell(socket);
@@ -346,15 +347,26 @@ public int OnSocketReceive(Handle socket, char[] receiveData, const int dataSize
             }
 
             // Find channel index
+            // BosaikNet note: this is case-sensitive for some reason. Use lowercase in the config.
             iChannel = g_hChannels.FindString(sData[2]);
             if (iChannel == -1) {
                 continue;
             }
 
-            // If start of text does not equal trigger, ignore
+            // If start of text does not equal trigger, ignore 
+            // BosaikNet: relay message to in-game if there's no trigger character
             int iPos = StrContains(sLines[i][1], ":") + 2;
             iStart   = CheckForTrigger(sLines[i][iPos]);
             if (iStart == -1) {
+                int iCommand = g_hCommands.FindString("_msg2");
+                if (iCommand == -1) { // if 2.5.3+bn ircrelay-chat isn't being used, don't crash
+                    continue;
+                }
+                Call_StartFunction(g_hCommandPlugins[iCommand], g_fCommandCallbacks[iCommand]);
+                Call_PushString(sData[2]);
+                Call_PushString(sHost[0]); // no triggers to strip, so use the whole line
+                Call_PushString(sLines[i][iPos]);
+                Call_Finish();
                 continue;
             }
 

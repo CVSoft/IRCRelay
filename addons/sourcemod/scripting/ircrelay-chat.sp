@@ -64,6 +64,7 @@ public void OnLibraryAdded(const char[] name)
     g_hXsPage.GetString(sXsPage, sizeof(sXsPage));
 
     IRC_RegisterCommand("msg",  IrcCommand_Msg,  IRC_GetAccess(sXsMsg));
+    IRC_RegisterCommand("_msg2",  IrcCommand_Msg2,  IRC_GetAccess(sXsMsg));
     IRC_RegisterCommand("page", IrcCommand_Page, IRC_GetAccess(sXsPage));
 }
 
@@ -80,6 +81,11 @@ public void IrcCommand_Msg(const char[] channel, const char[] name, const char[]
 {
     PrintToChatAll("%c[IRC]%c %s: %s", CLR_GREEN, CLR_DEFAULT, name, arg);
     IRC_PrivMsg(channel, "(IRC) %s: %s", name, arg);
+}
+
+public void IrcCommand_Msg2(const char[] channel, const char[] name, const char[] arg)
+{
+    PrintToChatAll("%c[IRC]%c %s: %s", CLR_GREEN, CLR_DEFAULT, name, arg);
 }
 
 public void IrcCommand_Page(const char[] channel, const char[] name, const char[] arg)
