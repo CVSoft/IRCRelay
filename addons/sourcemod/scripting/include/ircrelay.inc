@@ -14,7 +14,7 @@
 #define IRC_REVERSE			22
 #define IRC_UNDERLINE		31
 
-#define IRC_VERSION			"2.5.3"
+#define IRC_VERSION			"2.5.3+bn1"
 
 enum IrcAccess
 {
